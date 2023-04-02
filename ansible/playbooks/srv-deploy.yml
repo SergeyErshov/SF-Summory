@@ -1,0 +1,107 @@
+# This playbook for GNU Ubuntu/Debian Linux
+
+- name: packages/docker/docker-compose
+  hosts: srv
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - predeploy
+
+  tasks:
+
+    - name: installing dependeses and tools
+      package:
+        name:
+          - wget
+          - curl
+          - gcc
+          - unzip
+          - ca-certificates
+          - apt-transport-https
+          - software-properties-common
+        state: present
+        update_cache: true
+
+    - name: creating data directory
+      file:
+        path: /usr/data
+        state: directory
+        owner: root
+        group: root
+        mode: "u=rw,g=rw,o=r"
+        recurse: true
+
+    - name: add docker repo gpg key
+      shell:
+        cmd: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg"
+
+    - name: add docker repo
+      shell:
+        cmd: 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null'
+
+    - name: install docker
+      package:
+        name: docker-ce
+        state: present
+        update_cache: true
+
+    - name: run && enable autostart docker
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: download docker compose
+      shell:
+        cmd: "curl -SL https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-linux-x86_64 -o ./docker-compose"
+        chdir: "/usr/bin"
+
+    - name: make docker-compose executable
+      file:
+        path: "/usr/bin/docker-compose"
+        mode: "u+x,g+x"
+
+- name: deploy application
+  hosts: srv
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - app_deploy
+
+  tasks:
+
+    - name: create distrib directory
+      file:
+        path: /usr/distrib
+        state: directory
+        owner: root
+        group: root
+        mode: "u=rw,g=rw,o=r"
+        recurse: true
+
+    - name: download app archive from github
+      get_url:
+        url: "https://github.com/vinhlee95/django-pg-docker-tutorial/archive/refs/heads/master.zip"
+        dest: "/usr/distrib"
+
+    - name: unzip app
+      unarchive:
+        src: "/usr/distrib/django-pg-docker-tutorial-master.zip"
+        dest: "/usr/distrib"
+        remote_src: true
+
+    - name: copy app to data dir
+      copy:
+        src: "/usr/distrib/django-pg-docker-tutorial-master"
+        dest: "/usr/data"
+        remote_src: true
+
+
+
+
+        
+
