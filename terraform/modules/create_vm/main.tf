@@ -21,6 +21,7 @@ resource "yandex_vpc_address" "external" {
 resource "yandex_compute_instance" "vm" {
   description        = var.instance_description
   name               = var.instance_name
+  hostname           = var.vm_hostname
   platform_id        = var.platform
   service_account_id = data.yandex_iam_service_account.user_id.id
   zone               = var.zone_name

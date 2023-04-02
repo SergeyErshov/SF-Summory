@@ -27,6 +27,11 @@ variable "instance_name" {
   type        = string
 }
 
+variable "vm_hostname" {
+  description = "Specify hostname of creating vm"
+  type        = string
+}
+
 variable "instance_description" {
   description = "Specify description for creating instance"
   type        = string
