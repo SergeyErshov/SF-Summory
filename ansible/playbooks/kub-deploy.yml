@@ -1,0 +1,193 @@
+# This playbook for GNU Ubuntu/Debian Linux
+
+- name: packages/k8s -install
+  hosts: k8s
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - kubinstall
+
+  tasks:
+
+    - name: installing dependeses and tools
+      package:
+        name:
+          - wget
+          - curl
+          - vim
+          - git
+          - gcc
+          - unzip
+          - apt-transport-https
+          - software-properties-common
+          - gnupg2
+          - ca-certificates
+        state: present
+        update_cache: true
+
+    - name: get google cloud gpg ket
+      shell:
+        cmd: "curl -fsSL  https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/k8s.gpg"
+    
+    - name: add google gpg key
+      shell:
+        cmd: "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -"
+
+    - name: add kubernetes repo
+      shell:
+        cmd: 'echo "deb https://packages.cloud.google.com/apt kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list'
+
+    - name: add needed kernel modules
+      shell:
+        cmd: |
+          tee /etc/modules-load.d/containerd.conf << EOF
+          overlay
+          br_netfilter
+          EOF
+
+    - name: load modules
+      shell:
+        cmd: "modprobe overlay && modprobe br_netfilter"
+
+    - name: set kernal parameters
+      shell:
+        cmd: |
+          tee /etc/sysctl.d/kubernetes.conf << EOF
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
+          EOF
+
+    - name: apply changes
+      command: "sysctl --system"
+
+    - name: add docker repo gpg key
+      shell:
+        cmd: "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg"
+
+    - name: add docker repo
+      shell:
+        cmd: 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null'
+
+    - name: installing containerd
+      package:
+        name:
+          - containerd.io 
+        state: present
+        update_cache: true
+
+    - name: creating default config of containerd
+      shell:
+        cmd: "containerd config default | tee /etc/containerd/config.toml >/dev/null 2>&1"
+
+    - name: configuring containerd
+      shell:
+        cmd: 'sed -i "s/SystemdCgroup \= false/SystemdCgroup \= true/g" /etc/containerd/config.toml'
+
+    - name: restarting and enabled containerd
+      systemd:
+        name: containerd
+        state: restarted
+        enabled: true
+    
+    - name: installing k8s needed packages
+      package:
+        name:
+          - kubelet 
+          - kubeadm 
+          - kubectl
+        state: present
+        update_cache: true
+
+    - name: disabling autoapdate k8s packages
+      command: "apt-mark hold kubelet kubeadm kubectl"
+
+
+- name: master node initializating
+  hosts: kub_master
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - master_init
+
+  tasks:
+
+    - name: init master node
+      shell:
+        cmd: "kubeadm init --control-plane-endpoint=master.ru-central1.internal > /home/esm/master.txt"
+
+    - name: get master.txt
+      fetch:
+        src: "/home/esm/master.txt"
+        dest: "../../.metadata/"
+        flat: yes
+
+    - name: create cluster config dir
+      file:
+        path: "/home/esm/.kube"
+        state: directory
+        owner: esm
+        group: esm
+        mode: "u=rwx,g=rx,o="
+        recurse: true
+
+    - name: copy kube config
+      copy:
+        src: "/etc/kubernetes/admin.conf"
+        dest: "/home/esm/.kube/config"
+        owner: esm
+        group: esm
+        mode: "u=rw,g=rw,o="
+        remote_src: true
+
+
+- name: working node joining
+  hosts: kub_app
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - worker_join
+
+  tasks:
+
+    - name: copy master.txt
+      copy:
+        src: "../../.metadata/master.txt"
+        dest: "/home/esm/master.txt"
+
+    - name: set command from file to variable
+      shell:
+        cmd: "str=$(tail -2 /home/esm/master.txt)"
+
+    - name: remove \ from command
+      shell:
+        cmd: "cmd=$(echo $str | sed 's:\\::g')"
+
+- name: install CNI to master
+  hosts: kub_master
+  gather_facts: false
+  become: false
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - master_cni
+
+  tasks:
+
+    - name: apply calico
+      shell:
+        cmd: "kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml"
+
+
+
+
+
+    
+
+
