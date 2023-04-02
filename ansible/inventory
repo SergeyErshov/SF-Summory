@@ -1,10 +1,10 @@
 [srv]
 62.84.118.105
 
-[kub-master]
+[kub_master]
 51.250.14.17
 
-[kub-app]
+[kub_app]
 84.201.129.148
 
 [k8s]
