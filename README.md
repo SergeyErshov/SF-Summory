@@ -58,5 +58,11 @@
 3. Подключаемся на сервер srv и деплоим наше приложение с помощью docker-compose ```docker-compose up -d``` проверяем, что приложение поднялось, проверяем лог docker-compose
    на предмет отсутсвия ошибок.  
 
+4.  Дополняем playbook srv-deploy.yml секцией установки gitlab-runner на машину srv. Выполняем playbook ```ansible-playbook -i ./inventory -u <user> --private-key <path_to_key> -t runner_inst ./playbooks/srv-deploy.yml```  
+
+5. В GitLab создаем новый [проект](https://gitlab.com/sf-devops32/fs-summury) и настраиваем в нем CI, получаем токен.    
+
+6. Подключаемся к srv, регистрируем наш раннер, проверяем его доступность в GitLab.  
+
 
 
