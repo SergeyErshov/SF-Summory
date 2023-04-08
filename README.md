@@ -46,3 +46,17 @@
 
 На данном этапе окружения подготовлено к работе, спринт №1 завершен
 
+**Спринт №2**
+
+1. Дополняем playbook srv-deploy.yml секцией сборки и доставки приложения на srv. Чувствительные данные храним в файле .var, расположенном в директории .metadata, котороя исключена
+   из отслеживания git. Файл .var передаем в docker-compose директивой env_file.   
+
+   ![env_file](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/1_env_file.png "env_file")  
+
+2. Выполняем playbook srv-deploy с тегом app_deploy ```ansible-playbook -i ./inventory -u <user> --private-key <path_to_key> -t app_deploy ./playbooks/srv-deploy.yml```  
+   
+3. Подключаемся на сервер srv и деплоим наше приложение с помощью docker-compose ```docker-compose up -d``` проверяем, что приложение поднялось, проверяем лог docker-compose
+   на предмет отсутсвия ошибок.  
+
+
+
