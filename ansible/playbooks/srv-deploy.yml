@@ -141,7 +141,7 @@
 
   tasks:
 
-    - name: install gitlab repo
+    - name: install gitlab repositories
       shell:
         cmd: 'curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | bash'
 
