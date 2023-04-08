@@ -119,7 +119,7 @@
 
     - name: copy correct docker-compose.yml and correct Dockerfile
       copy:
-        src: "../../config/{{ item }}"
+        src: "../../django/{{ item }}"
         dest: "/usr/data/django"
       loop:
         - "docker-compose.yml"
@@ -127,7 +127,7 @@
 
     - name: copy settings.py
       copy:
-        src: "../../config/settings.py"
+        src: "../../django/settings.py"
         dest: "/usr/data/django/app/app"
 
 - name: isntall Gitlab runner
