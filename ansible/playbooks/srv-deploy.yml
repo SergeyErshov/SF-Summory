@@ -151,6 +151,12 @@
         state: present
         update_cache: true
 
+    - name: add gitlab-runner user to group docker
+      user:
+        name: gitlab-runner
+        groups: docker
+        append: yes
+
   
 
 
