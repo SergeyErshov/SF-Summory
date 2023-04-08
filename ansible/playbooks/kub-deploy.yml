@@ -184,6 +184,68 @@
       shell:
         cmd: "kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml"
 
+- name: install tools to master
+  hosts: kub_master
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - master_tools
+
+  tasks:
+
+    - name: get kompose
+      shell:
+        cmd: "curl -L https://github.com/kubernetes/kompose/releases/download/v1.28.0/kompose-linux-amd64 -o kompose"
+        chdir: "/usr/local/bin"
+
+    - name: make kompose executable
+      file:
+        path: /usr/local/bin/kompose
+        owner: root
+        group: root
+        mode: 'u=rwx,g=rwx,o=rx'
+
+- name: converting docker-compose to manifests
+  hosts: kub_master
+  gather_facts: false
+  become: false
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - convert
+
+  tasks:
+
+    - name: create working dir
+      file:
+        path: /home/esm/data
+        state: directory
+        owner: esm
+        group: esm
+
+    - name: copy docker-compose.yml
+      copy:
+        src: "../../kube/docker-compose.yml"
+        dest: "/home/esm/data"
+
+    - name: copy variables file to host
+      copy:
+        src: "../../.metadata/.var"
+        dest: "/home/esm/data"
+
+    - name: convert docker-compose yml to manifest
+      shell:
+        cmd: "kompose convert -f ./docker-compose.yml"
+        chdir: /home/esm/data
+
+    - name: delete docker-compose.yml
+      file:
+        path: /home/esm/data/docker-compose.yml
+        state: absent
+
+
 
 
 
