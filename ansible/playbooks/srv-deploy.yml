@@ -100,6 +100,38 @@
         dest: "/usr/data"
         remote_src: true
 
+    - name: rename django folder
+      shell:
+        cmd: "mv /usr/data/django-pg-docker-tutorial-master /usr/data/django"
+
+    - name: create postgresql data dir
+      file:
+        path: "/usr/data/pg_data"
+        state: directory
+        owner: root
+        group: root
+        mode: "u=rw,g=rw,o=r"
+
+    - name: copy variables file to host
+      copy:
+        src: "../../.metadata/.var"
+        dest: "/usr/data"
+
+    - name: copy correct docker-compose.yml and correct Dockerfile
+      copy:
+        src: "../../config/{{ item }}"
+        dest: "/usr/data/django"
+      loop:
+        - "docker-compose.yml"
+        - "Dockerfile"
+
+    - name: copy settings.py
+      copy:
+        src: "../../config/settings.py"
+        dest: "/usr/data/django/app/app"
+
+  
+
 
 
 
