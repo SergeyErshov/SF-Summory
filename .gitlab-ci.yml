@@ -13,6 +13,7 @@ docker_build:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
+    - tag=$CI_COMMIT_REF_SLUG
     - cd ./django
-    - docker build -t sergeyershov/django-app:$CI_COMMIT_TAG .
-    - docker push sergeyershov/django-app:$CI_COMMIT_TAG
+    - docker build -t sergeyershov/django-app:$tag .
+    - docker push sergeyershov/django-app:$tag
