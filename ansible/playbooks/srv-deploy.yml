@@ -130,6 +130,27 @@
         src: "../../config/settings.py"
         dest: "/usr/data/django/app/app"
 
+- name: isntall Gitlab runner
+  hosts: srv
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - runner_inst
+
+  tasks:
+
+    - name: install gitlab repo
+      shell:
+        cmd: 'curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh" | bash'
+
+    - name: installing gitlab runner
+      package:
+        name: "gitlab-runner"
+        state: present
+        update_cache: true
+
   
 
 
