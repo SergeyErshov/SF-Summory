@@ -245,6 +245,16 @@
         path: /home/esm/data/docker-compose.yml
         state: absent
 
+    - name: fetch manifests
+      synchronize:
+        src: "/home/esm/data/"
+        dest: "../../.metadata/manifests"
+        mode: pull
+
+    - name: remove data dir
+      shell:
+       cmd: "rm -rf /home/esm/data"
+
 
 
 
