@@ -1,0 +1,9 @@
+myapp:
+  tag: v1.0.1
+
+persistentvolume:
+  capacity: 200M
+  path: /usr/pg_data
+
+persistentvolumeclaim:
+  capacity: 200M

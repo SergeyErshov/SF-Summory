@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pg-data-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: {{ .Values.persistentvolume.capacity }} # Capacity for this persistent volume
+  accessModes:
+    - ReadWriteOnce
+  hostPath: # where pesistent volume is created on the kubernetes node (needs to be /data for minikube)
+    path: {{ .Values.persistentvolume.path }} 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim #claim a portion of persistent volume
+metadata:
+  labels:
+    app: db
+  name: pg-data-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce # mount as read-write by a single node
+  resources:
+    requests:
+      storage: {{ .Values.persistentvolumeclaim.capacity }} # storage capacity consumed from the persistent volume

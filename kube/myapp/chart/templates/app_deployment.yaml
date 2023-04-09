@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app-django
+          image: sergeyershov/django-app:{{ .Values.myapp.tag }}
+          command: ['/bin/sh']
+          args: ['-c', 'python manage.py migrate && python manage.py runserver 0.0.0.0:3003']
+          ports:
+            - containerPort: 3003
+          env:
+            - name: DB_HOST
+              value: service-db #such as db_service
+
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: DEBUG
+
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: POSTGRES_DB
+
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: POSTGRES_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key:  POSTGRES_PASSWORD
+
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: SECRET_KEY
