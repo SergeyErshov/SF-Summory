@@ -31,23 +31,23 @@ spec:
                   name: credentials
                   key: DEBUG
 
-            - name: DB_NAME
+            - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
                   name: credentials
-                  key: DB_NAME
+                  key: POSTGRES_DB
 
-            - name: DB_USER
+            - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
                   name: credentials
-                  key: DB_USER
+                  key: POSTGRES_USER
 
-            - name: DB_PASS
+            - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: credentials
-                  key:  DB_PASS
+                  key:  POSTGRES_PASSWORD
 
             - name: SECRET_KEY
               valueFrom:
