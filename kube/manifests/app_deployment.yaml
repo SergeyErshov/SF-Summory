@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django
+  labels:
+    app: django
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+        - name: django
+          image: sergeyershov/django-app:v1.0.0
+          command: ['/bin/sh']
+          args: ['-c', 'python manage.py migrate && python manage.py runserver 0.0.0.0:3003']
+          ports:
+            - containerPort: 3003
+          env:
+            - name: DB_HOST
+              value: db #such as db_service
+
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: DEBUG
+
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: DB_NAME
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: DB_USER
+
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key:  DB_PASS
+
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: credentials
+                  key: SECRET_KEY
