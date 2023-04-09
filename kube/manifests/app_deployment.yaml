@@ -1,29 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django
-  labels:
-    app: django
+  name: app-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: django
+      app: app
   template:
     metadata:
       labels:
-        app: django
+        app: app
     spec:
       containers:
-        - name: django
-          image: sergeyershov/django-app:v1.0.0
+        - name: app-django
+          image: sergeyershov/django-app:v1.0.1
           command: ['/bin/sh']
           args: ['-c', 'python manage.py migrate && python manage.py runserver 0.0.0.0:3003']
           ports:
             - containerPort: 3003
           env:
             - name: DB_HOST
-              value: db #such as db_service
+              value: service-db #such as db_service
 
             - name: DEBUG
               valueFrom:
