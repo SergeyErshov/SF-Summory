@@ -207,14 +207,14 @@
         group: root
         mode: 'u=rwx,g=rwx,o=rx'
 
-- name: converting docker-compose to manifests
+- name: copy manifests to master node
   hosts: kub_master
   gather_facts: false
   become: false
   become_user: "root"
   become_method: "sudo"
   tags:
-    - convert
+    - manifest
 
   tasks:
 
@@ -225,35 +225,53 @@
         owner: esm
         group: esm
 
-    - name: copy docker-compose.yml
+    - name: copy manifests
       copy:
-        src: "../../kube/docker-compose.yml"
+        src: "{{ item }}"
         dest: "/home/esm/data"
+      with_fileglob: "../../kube/manifests/*.yaml"
 
-    - name: copy variables file to host
-      copy:
-        src: "../../.metadata/.var"
-        dest: "/home/esm/data"
+- name: install helm
+  hosts: kub_master
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - helm
 
-    - name: convert docker-compose yml to manifest
+  tasks:
+
+    - name: get installation script
       shell:
-        cmd: "kompose convert -f ./docker-compose.yml"
-        chdir: /home/esm/data
+        cmd: "curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3"
+        chdir: "/home/esm"
 
-    - name: delete docker-compose.yml
+    - name: make script executable
       file:
-        path: /home/esm/data/docker-compose.yml
-        state: absent
+        path: "/home/esm/get_helm.sh"
+        mode: 'u=rwx,g=rw,o=r'
 
-    - name: fetch manifests
-      synchronize:
-        src: "/home/esm/data/"
-        dest: "../../.metadata/manifests"
-        mode: pull
-
-    - name: remove data dir
+    - name: execute helm installation file
       shell:
-       cmd: "rm -rf /home/esm/data"
+        cmd: "./get_helm.sh"
+        chdir: "/home/esm"
+
+- name: helm chart creating
+  hosts: kub_master
+  gather_facts: false
+  become: false
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - helm_chart
+
+  tasks:
+
+    - name: syncronized helm chart
+      synchronize:
+        src: "../../kube/myapp"
+        dest: /home/esm
 
 
 
