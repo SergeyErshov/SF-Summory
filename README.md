@@ -86,11 +86,26 @@
 
 17. Упаковываем helm chart нашего приложения в архив ```helm package ./myapp/chart/``` и заливаем в архив репозиторий.  
 
-18. Подготавливаем [pipeline](https://gitlab.com/sf-devops32/fs-summury/-/blob/main/.gitlab-ci.yml) и необходимые переменные.  
+18. Добавляем стадию деплоя в [pipeline](https://gitlab.com/sf-devops32/fs-summury/-/blob/main/.gitlab-ci.yml) и необходимые переменные.  
     
 19. С помощью запуска [playbook](https://github.com/SergeyErshov/SF-Summory/blob/main/ansible/playbooks/srv-deploy.yml) устанавливаем на srv kubectl и helm, конфигурируем доступ к кластеру.  
+   
+20. Сохраняем kubeconfig в файл /usr/share/config и даем на него доступ для пользователя gitlab-runner.  
 
-20. Заливаем изменения в репозиторий и добавляем тег.  
+21. Заливаем изменения в репозиторий и добавляем тег. Проверяем, что pipeline запустился, дожидаемся его завершения.  
+
+22. Проверяем, что все стадии pipeline успешно отпработали:  
+    ![pipeline_result](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/2_pipeline_result.png "pipeline_result")  
+
+    Приложение задеплоилось в кластер с новой версией билда:  
+    ![pods](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/3_pods.png "pods")  
+
+    А также доступность нашего прилождения браузере:  
+    ![web](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/4_myapp_web.png "web")
+
+Спринт №2 завершен
+
+
 
 
 
