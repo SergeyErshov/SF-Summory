@@ -84,7 +84,13 @@
 
 16. Регистрируем агента gitlab по [этому мануалу](https://docs.gitlab.com/ee/user/clusters/agent/install/index.html) (альтернативно helm чарт агента получаем [отсюда](https://cloud.yandex.com/en/docs/managed-kubernetes/operations/applications/gitlab-agent))  
 
+17. Упаковываем helm chart нашего приложения в архив ```helm package ./myapp/chart/``` и заливаем в архив репозиторий.  
 
+18. Подготавливаем [pipeline](https://gitlab.com/sf-devops32/fs-summury/-/blob/main/.gitlab-ci.yml) и необходимые переменные.  
+    
+19. С помощью запуска [playbook](https://github.com/SergeyErshov/SF-Summory/blob/main/ansible/playbooks/srv-deploy.yml) устанавливаем на srv kubectl и helm, конфигурируем доступ к кластеру.  
+
+20. Заливаем изменения в репозиторий и добавляем тег.  
 
 
 
