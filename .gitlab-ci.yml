@@ -1,6 +1,7 @@
 ---
 stages:
   - build
+  - deploy
 
 docker_build:
   stage: build
@@ -15,8 +16,18 @@ docker_build:
   script:
     - env
     - export
-    - echo "Running build with tag $tag"
     - tag=$CI_COMMIT_TAG
+    - echo "Running build with tag $tag"
     - cd ./django
     - docker build -t sergeyershov/django-app:$tag .
     - docker push sergeyershov/django-app:$tag
+
+app_deploy: 
+  stage: deploy
+  environment: production
+  script:
+    - tag=$CI_COMMIT_TAG
+    - echo "Deploy app with build version $tag"
+    - helm upgrade --atomic --timeout 600s --set myapp.tag=$tag --install --namespace $CI_K8S_NAMESPACE myapp https://gitlab.com/sf-devops32/fs-summury/-/tree/main/kube/myapp/chart
+    - kubectl get pods -n $CI_K8S_NAMESPACE
+   
