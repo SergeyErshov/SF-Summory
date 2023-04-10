@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app-deployment
+  labels:
+    k8s-app: myapp
+    gitlab: sf-summary
 spec:
   replicas: 1
   selector:

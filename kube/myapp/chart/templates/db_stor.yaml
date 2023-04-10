@@ -4,6 +4,8 @@ metadata:
   name: pg-data-pv
   labels:
     type: local
+    k8s-app: myapp
+    gitlab: sf-summary
 spec:
   storageClassName: manual
   capacity:
@@ -18,6 +20,8 @@ kind: PersistentVolumeClaim #claim a portion of persistent volume
 metadata:
   labels:
     app: db
+    k8s-app: myapp
+    gitlab: sf-summary
   name: pg-data-pv-claim
 spec:
   storageClassName: manual

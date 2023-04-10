@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: service-django
   labels:
+    k8s-app: myapp
+    gitlab: sf-summary
     app: app
 spec:
   type: ClusterIP
   ports:
-    - port: 3003 
+    - port: 3003
+      targetPort: 3003 
   selector:
     app: app

@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: service-db
   labels:
+    k8s-app: myapp
+    gitlab: sf-summary
     app: db
 spec:
   type: ClusterIP
   ports:
     - port: 5432
+      targetPort: 5432
   selector:
     app: db
