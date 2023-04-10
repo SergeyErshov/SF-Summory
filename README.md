@@ -79,6 +79,10 @@
 13. Подключаемся пл ssh к мастер ноде, удаляем все ранее созданные ресурсы в текущем наймспейсе, переходим в директорию с нашим helm-чартом и выполняем ```helm upgrade --install myapp .```  
 
 14. Проверяем, что поды с нашими контейнерами поднялись командой ```kubectl get pods```. Проверяем доступность нашего приложения.
+   
+15. Деплоим ingress controller на мастер ноде ```kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.7.0/deploy/static/provider/cloud/deploy.yaml```  
+
+
 
 
 
