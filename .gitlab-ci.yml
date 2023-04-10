@@ -28,6 +28,8 @@ app_deploy:
   script:
     - tag=$CI_COMMIT_TAG
     - echo "Deploy app with build version $tag"
+    - export KUBECONFIG=/usr/share/config
+    - helm init --kube-context default --upgrade
     - helm upgrade --atomic --timeout 600s --set myapp.tag=$tag --install --namespace $CI_K8S_NAMESPACE myapp https://gitlab.com/sf-devops32/fs-summury/-/raw/main/kube/myapp/myapp-1.0.0.tgz
     - kubectl get pods -n $CI_K8S_NAMESPACE
    
