@@ -1,0 +1,14 @@
+- name: fetch hel chart from server
+  hosts: kub_master
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+
+  tasks:
+
+    - name: get chart
+      fetch:
+        src: "/home/esm/myapp-1.0.0.tgz"
+        dest: "../../kube/myapp/"
+        flat: true
