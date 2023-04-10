@@ -24,6 +24,9 @@ docker_build:
 
 app_deploy: 
   stage: deploy
+  image:
+    name: alpine/helm:3.5.3
+    entrypoint: [""]
   environment: production
   script:
     - tag=$CI_COMMIT_TAG
