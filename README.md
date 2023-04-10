@@ -82,6 +82,10 @@
    
 15. Деплоим ingress controller на мастер ноде ```kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.7.0/deploy/static/provider/cloud/deploy.yaml```  
 
+16. Регистрируем агента gitlab по [этому мануалу](https://docs.gitlab.com/ee/user/clusters/agent/install/index.html) (альтернативно helm чарт агента получаем [отсюда](https://cloud.yandex.com/en/docs/managed-kubernetes/operations/applications/gitlab-agent))  
+
+
+
 
 
 
