@@ -157,6 +157,34 @@
         groups: docker
         append: yes
 
+
+- name: isntall kubectl
+  hosts: srv
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - srv_kubectl
+
+  tasks:
+
+    - name: download gpg key
+      shell:
+        cmd: "curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+
+    - name: add repo
+      shell:
+        cmd: 'echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list'
+
+    - name: install kubectl
+      package:
+        name: kubectl
+        state: present
+        update_cache: true
+
+    
+
   
 
 
