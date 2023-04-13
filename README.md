@@ -105,6 +105,28 @@
 
 Спринт №2 завершен
 
+**Спринт №3**
+
+1. Настройка логирования. В качестве logshipper будем использовать fluentd, логи будем хранить централизовано на хосте srv в elasticksearch в связке с kibana.  
+
+2. Развернем ELK-стек на ВМ srv. Будем использовать docker-compose. Подготовливаем docker-compose.yml и закидываем на сервер, выполняя плейбук srv-deploy.yml с тегом elk.  
+
+3. Подключаемся к srv и поднимаем docker-compose, предварительно задав перменную окружения $ELK_PASS для kibana.  
+
+4. Подготовим манифесты для деплоя fluentd в кластере kubernetes. При подготовке используем [этот мануал](https://mcs.mail.ru/docs/additionals/cases/cases-logs/case-fluentd), правим ошибку парсинга по [этому мануалу](https://ryanwilliams.blog/post/2021-04-17-logging-fluentd-and-aks/), модифицируем манифесты под себя по официальному [github](https://github.com/fluent/fluentd-kubernetes-daemonset).  
+
+5. Запускаем плейбук kub-deploy.yml с тегом fluentd для доставки манифестов в кластер.  
+   
+6. Деплоим приложение, проверяем, что под поднялся, в логе нет ошибок:  
+   
+![fluentd](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/5_fluentd_pod.png "fluentd")  
+
+7. Авторизаруемся в kibana, добавляем индекс. В результате наблюдаем логи с нашего кластера (как самого, так и контейнеров):  
+
+![kibana](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/6_kibana.png "kibana")
+
+8. 
+
 
 
 
