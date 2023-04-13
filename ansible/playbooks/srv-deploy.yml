@@ -209,6 +209,34 @@
         cmd: "./get_helm.sh"
         chdir: "/home/esm"
 
+- name: logging
+  hosts: srv
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - elk
+
+  tasks:
+
+    - name: create needed dir
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: docker     
+        mode: "u=rwx,g=rwx,o=rwx"
+      loop:
+        - "/usr/data/elk"
+        - "/usr/data/elk/elasticsearch"
+
+    - name: copy docker-compose.yml
+      copy:
+        src: "../../logging/elk/docker-compose.yml"
+        dest: "/usr/data/elk"
+
+
     
 
   
