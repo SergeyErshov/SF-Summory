@@ -273,6 +273,22 @@
         src: "../../kube/myapp"
         dest: /home/esm
 
+- name: fluentd
+  hosts: kub_master
+  gather_facts: false
+  become: false
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - fluentd
+
+  tasks:
+
+    - name: syncronized fluentd maniffests
+      synchronize:
+        src: "../../logging/fluentd"
+        dest: /home/esm
+
 
 
 
