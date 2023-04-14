@@ -8,7 +8,7 @@
 |        vm        |                 roles               |                                           description                                     |
 | ---------------- | ----------------------------------- | ----------------------------------------------------------------------------------------- |
 | srv              | deploing, logging, monitoring       | Vm for deploing apps, with logging and moniroting contenerized tools                      |
-| kup-master       | master node                         | Master node for Kubernets cluster                                                         |
+| kub-master       | master node                         | Master node for Kubernets cluster                                                         |
 | kub-app          | worker node                         | Worker node for kubernetes cluster                                                        |
 
 **Спринт №1**
