@@ -1,0 +1,61 @@
+groups: 
+
+- name: "site myapp_web"
+  rules:
+
+  - alert: BlackboxProbeHttpFailure
+    expr: probe_http_status_code != 200
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: Blackbox probe HTTP failure (instance {{ $labels.instance }})
+      description: "HTTP status code is not 200\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: BlackboxSlowProbe
+    expr: avg_over_time(probe_duration_seconds[3m]) >= 5
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: Blackbox slow probe (instance {{ $labels.instance }})
+      description: "Blackbox probe took more than 5s to complete\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+- name: "srv"
+  rules:
+
+  - alert: HostMemoryUtil
+    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 20
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: Hight memory utilization (instance {{ $labels.instance }})
+      description: "Node memory is filling up (< 20% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: HostHighLoad
+    expr: node_load1 > 0.8
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      summary: "Host {{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+
+  - alert: DiskSpaceUsage
+    expr: 100.0 - 100 * (wmi_logical_disk_free_bytes / wmi_logical_disk_size_bytes) > 90
+    for: 20m
+    labels:
+      severity: high
+    annotations:
+      summary: "Disk Space Usage (instance {{ $labels.instance }})"
+      description: "Disk Space on Drive is used more than 90%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}."
+
+  - alert: HostRebooted
+    expr: sum(time()-node_boot_time_seconds) < 60
+    for: 0m
+    labels:
+      severity: info
+    annotations:
+      summary: Node was rebooted (instance {{ $labels.instance }})
+      description: "Node has just been restarted, less than minute ago on {{ $labels.instance }}.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

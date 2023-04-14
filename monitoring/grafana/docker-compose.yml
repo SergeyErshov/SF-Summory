@@ -1,0 +1,86 @@
+version: '3'
+services:
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus01
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: always
+
+  alertmanager:
+    image: prom/alertmanager:v0.21.0
+    container_name: alertmanager
+    hostname: alertmanager01
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    restart: always
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/etc/alertmanager/data'
+
+  alertmanager-bot:
+      image: metalmatze/alertmanager-bot:0.4.3
+      container_name: alertbot
+      hostname: alertbot01
+      command:
+        - --alertmanager.url=http://alertmanager:9093
+        - --log.level=info
+        - --store=bolt
+        - --bolt.path=/data/bot.db
+        - --listen.addr=0.0.0.0:8098
+      env_file:
+        /usr/data/monitoring/.bot_env
+      expose:
+        - 8098
+      restart: always
+      volumes:
+        - ./bot_data:/data
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-explorer
+    hostname: monitoring-local
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.ignored-mount-points
+      - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+    expose:
+      - 9100
+    restart: always
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter
+    container_name: blackbox-explorer
+    hostname: blackbox01
+    expose:
+      - 9115
+    restart: always
+    volumes:
+      - ./blackbox:/config
+    command: --config.file=/config/blackbox.yml
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    hostname: grafanasrv
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana:/var/lib/grafana:rw
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    restart: always
