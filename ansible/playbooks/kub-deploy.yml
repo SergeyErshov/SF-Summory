@@ -289,6 +289,22 @@
         src: "../../logging/fluentd"
         dest: /home/esm
 
+- name: prometheus
+  hosts: kub_master
+  gather_facts: false
+  become: false
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - prometheus
+
+  tasks:
+
+    - name: syncronized prometheus manifests
+      synchronize:
+        src: "../../monitoring/prometheus-k8s"
+        dest: /home/esm
+
 
 
 

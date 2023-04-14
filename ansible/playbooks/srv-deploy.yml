@@ -236,6 +236,45 @@
         src: "../../logging/elk/docker-compose.yml"
         dest: "/usr/data/elk"
 
+- name: monitoring
+  hosts: srv
+  gather_facts: false
+  become: true
+  become_user: "root"
+  become_method: "sudo"
+  tags:
+    - grafana
+
+  tasks:
+
+    - name: create needed dir
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: docker     
+        mode: "u=rwx,g=rwx,o=rwx"
+      loop:
+        - "/usr/data/monitoring"
+        - "/usr/data/monitoring/alertmanager"
+        - "/usr/data/monitoring/prometheus"
+        - "/usr/data/monitoring/bot_data"
+        - "/usr/data/monitoring/blackbox"
+        - "/usr/data/monitoring/grafana"
+        - "/usr/data/monitoring/grafana/provisioning"
+
+    - name: copy nedeed config
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop:
+        - { src: '../../monitoring/alertmanager/config.yml', dest: '/usr/data/monitoring/alertmanager' }
+        - { src: '../../monitoring/prometheus/alert.rules', dest: '/usr/data/monitoring/prometheus' }
+        - { src: '../../monitoring/prometheus/prometheus.yml', dest: '/usr/data/monitoring/prometheus' }
+        - { src: '../../monitoring/blackbox/blackbox.yml', dest: '/usr/data/monitoring/blackbox' }
+        - { src: '../../monitoring/grafana/docker-compose.yml', dest: '/usr/data/monitoring' }
+        - { src: '../../.metadata/.bot_env', dest: '/usr/data/monitoring' }
+
 
     
 
