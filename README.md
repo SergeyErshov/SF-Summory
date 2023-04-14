@@ -80,7 +80,7 @@
 
 14. Проверяем, что поды с нашими контейнерами поднялись командой ```kubectl get pods```. Проверяем доступность нашего приложения.
    
-15. Деплоим ingress controller на мастер ноде ```kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.7.0/deploy/static/provider/cloud/deploy.yaml```  
+15. Деплоим ingress controller на мастер ноде ```kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml```  
 
 16. Регистрируем агента gitlab по [этому мануалу](https://docs.gitlab.com/ee/user/clusters/agent/install/index.html) (альтернативно helm чарт агента получаем [отсюда](https://cloud.yandex.com/en/docs/managed-kubernetes/operations/applications/gitlab-agent))  
 
@@ -125,7 +125,31 @@
 
 ![kibana](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/6_kibana.png "kibana")
 
-8. 
+8. Настройка мониторинга. В качестве инструмента визуализации дашбордов метрик будем использовать Grafana. Это достаточно мощный инструмент, который, к тому же, позволит отправлять необходимые алерты. Для сбора логов используем prometheus stack. Собирать данные о сайте будем с помощью blackbox. Алерты будем отправлять в telegram.  
+
+9. Создаем в telegram нового бота и получаем токен.  
+
+9.  Развернем Grafana на ВМ srv. Подготовим docker-compose, а также все необходимые конфиги. Для удобства все соберем в директории monitoring.  
+
+10. Запускаем playbook srv-deploy.yml с тегом grafana для доставки всех необходимых конфигов на srv.  
+
+11. Подключаемся к srv и поднимаем docker-compose из дирректории /usr/data/monitoring. Дожидаемся старта всех контейнеров.  
+    
+12. Подключаемся к веб-интерфейсу grafana, добавляем datasource node-explorer, создаем дашборд с необходимыми нам метриками. Коды ответа сайта получаем с помощью blackbox.  
+
+13. На этом этапе необходимо настроить мониторинг кластера kubernetes. Подготавливаем манифесты для деплоя prometheus в кластер k8s по [этому](https://devopscube.com/setup-prometheus-monitoring-on-kubernetes/) и [этому](https://devopscube.com/setup-kube-state-metrics/#:~:text=What%20is%20Kube%20State%20Metrics%3F,stability%20as%20the%20Kubernetes%20API.) мануалам.  
+
+14. Запускаем playbook kube-deploy.yml с тегом prometheus для доставки всех необходимых манифестов на мастер-ноду.  
+
+15. Применяем манифесты, проверяем что все поднялось. Идем в веб-интерфейс grafana, добавляем наш datasource (prometheus in kubernetes). Импортируем готовые дажборды k8s кластера, добавляем нужные нам в наш дашборд:  
+    ![Mydashbord](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/7_mydashbord.png "mydashbord")  
+
+16. Настраиваем мониторинг и убеждаемся в его работоспособности:
+    ![alert](https://github.com/SergeyErshov/SF-Summory/blob/main/RAW/8_telegramm_alert.png "alert")
+
+На этом спринт №3 можно считать оконченным
+
+**P.S. Приложение доступно по адресу: http://84.252.130.109/**
 
 
 
